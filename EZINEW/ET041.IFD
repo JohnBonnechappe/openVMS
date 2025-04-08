@@ -1,0 +1,572 @@
+Form EZITRAK041
+    /* This is the TRACKING Progress and solution screen  */
+
+    Form Data 
+        PROBLEM_NUMBER Word Integer
+        PROBLEM_DESC Character(75)
+        PROBLEM_STATUS Character(1)
+        APPLICATION_ID Character(3)
+        PRIORITY_ID Character(1)
+        PERSON_ASSIGNED_ID Character(4)
+        PERSON_ASSIGNED_DESC Character(25)
+        PERSON_REDIRECTED_ID Character(4)
+        EST_TO_COMPLETE_DAYS Word Integer
+        PROGRESS_DESC Character(75)
+        SOLVED_DATE ADT
+        REF_PROBLEM_NUMBER Word Integer
+        Group DESC_GRP 
+            Occurs 20
+            SOLUTION_DESC Character(75)
+        End Group
+        Group COM_GRP 
+            KEY_PRESSED Character(1)
+        End Group
+        ERROR_MESSAGE Character(75)
+    End Data
+
+    Form Record EZITRAK041_REC
+        PROBLEM_NUMBER Word Integer
+        Group COM_GRP
+            KEY_PRESSED Character(1)
+        End Group
+        ERROR_MESSAGE Character(75)
+    End Record
+
+    Form Record EZITRAK042_REC
+        PROBLEM_DESC Character(75)
+        PROBLEM_STATUS Character(1)
+        APPLICATION_ID Character(3)
+        PRIORITY_ID Character(1)
+        PERSON_ASSIGNED_ID Character(4)
+        PERSON_ASSIGNED_DESC Character(25)
+        PERSON_REDIRECTED_ID Character(4)
+        EST_TO_COMPLETE_DAYS Word Integer
+        PROGRESS_DESC Character(75)
+        SOLVED_DATE ADT
+        REF_PROBLEM_NUMBER Word Integer
+        Group DESC_GRP
+            Occurs 20
+            SOLUTION_DESC Character(75)
+        End Group
+        Group COM_GRP
+            KEY_PRESSED Character(1)
+        End Group
+        ERROR_MESSAGE Character(75)
+    End Record
+
+
+    Layout VT_LAYOUT
+        Device
+            Terminal
+                Type %VT100
+        End Device
+        Size 24 Lines by 80 Columns
+
+        Viewport HEADER_VP
+            Lines 2 Through 4
+            Columns 1 Through 80
+        End Viewport
+
+        Viewport KEYS_VP
+            Lines 4 Through 20
+            Columns 58 Through 75
+        End Viewport
+
+        Viewport NOTES_VIEWPORT
+            Lines 4 Through 12
+            Columns 8 Through 34
+        End Viewport
+
+        Viewport HINTS_VP
+            Lines 15 Through 20
+            Columns 4 Through 75
+        End Viewport
+
+        Viewport MAIN_VP
+            Lines 5 Through 23
+            Columns 1 Through 80
+        End Viewport
+
+        Function UP ITEM
+            Is %UP
+        End Function
+
+        Function DOWN ITEM
+            Is %DOWN
+        End Function
+
+        Function EXIT_APPL
+            Is %KP_7
+        End Function
+
+        Function PREV_SCRN
+            Is %KP_8
+        End Function
+
+        Function UPDATE_SCREEN
+            Is %CARRIAGE_RETURN
+        End Function
+
+        Function SHOW_KEYS
+            Is %KP_5
+        End Function
+
+        Function ENTER_NOTES
+            Is %KP_9
+        End Function
+
+        Function SHOW_HINTS
+            Is %KP_4
+        End Function
+
+        Disable Response
+            Remove All
+        End Response
+
+        Transceive Response EZITRAK041_REC EZITRAK041_REC
+            Activate
+                Panel EZITRAK41_HEADER
+            Message
+                ERROR_MESSAGE
+        End Response
+
+        Transceive Response EZITRAK042_REC EZITRAK042_REC
+            Activate
+                Panel EZITRAK41_MAIN
+            Message
+                ERROR_MESSAGE
+        End Response
+
+        Apply Field Default Of
+            Autoskip
+            Use Help Message
+                "Real Men Don't use Help"
+        End Default
+
+
+        Panel EZITRAK41_HEADER
+            Viewport HEADER_VP
+            Display
+                %Keypad_Application
+
+            Function Response EXIT_APPL
+                Let COM_GRP.KEY_PRESSED = "E"
+                Return Immediate
+            End Response
+
+            Function Response UPDATE_SCREEN
+                Return
+            End Response
+
+            Function Response ENTER_NOTES
+            Activate
+                Panel EZITRAK01_NOTES
+                Position Immediate TO Panel
+                    EZITRAK01_NOTES
+            End Response
+
+            Function Response SHOW_KEYS
+            Display
+                EZITRAK01_KEYS
+                Position Immediate TO Panel
+                    EZITRAK01_KEYS
+            End Response
+
+            Function Response SHOW_HINTS
+                Display
+                    EZITRAK01_HINTS
+            End Response
+
+            Literal Rectangle
+                Line 1	Column 1
+                Line 3	Column 80
+            End Literal
+
+            Literal Text
+                Line 2
+                Column 29
+                Value "EZITRAK - PROBLEM TRACKING"
+            End Literal
+
+            Literal Text
+                Line 2
+                Column 2
+                Value " Problem Nbr :"
+                Display
+                    Bold
+            End Literal
+
+            Field PROBLEM_NUMBER
+                Line 2
+                Column 17
+                Output Picture 999R
+                No autoskip
+                Justification Right
+                Use Help Message
+                    "Enter a Problem Number"
+                /*             Output Picture is "Z(3)9" */
+            End Field
+
+        End Panel
+
+
+        Panel EZITRAK01_KEYS
+            Viewport KEYS_VP
+            Display
+                %Keypad_Application
+
+            Exit Response
+                Remove 
+                    KEYS_VP
+                Position to Previous Item
+                Deactivate Panel
+                    EZITRAK01_Keys
+            End Response
+
+            Function Response PREV_SCRN
+                Position Immediate to Previous Panel
+            End Response
+
+            Literal Text
+                Line 1
+                Column 4
+                Value "    Keys"
+            End Literal
+
+            Literal Rectangle
+                Line 1	Column 1
+                Line 17	Column 18
+            End Literal
+
+            Literal Text
+                Line 12
+                Column 3
+                Value "Ret - Update"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 4
+                Column 4
+                Value " KP7 - Exit"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 6
+                Column 4
+                Value " KP8 - Prev"
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK01_NOTES
+            Viewport NOTES_VIEWPORT
+            Display
+                %Keypad_Application
+
+            Remove
+            Literal Rectangle
+                Line 1	Column 1
+                Line 9	Column 27
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK01_HINTS
+            Viewport HINTS_VP
+            Display
+                %Keypad_Application
+
+            Remove
+            Literal Rectangle
+                Line 1	Column 1
+                Line 6	Column 72
+            End Literal
+
+            Literal Text
+                Line 2
+                Column 3
+                Value "You should enter any progress remarks on this screen. "-
+                    "When Closing"
+            End Literal
+
+            Literal Text
+                Line 3
+                Column 3
+                Value "a problem, up to 20 lines are available for keeping a "-
+                    "record of how"
+            End Literal
+
+            Literal Text
+                Line 4
+                Column 3
+                Value "the problem was solved. You can also refer to an "-
+                    "earlier problem."
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK41_MAIN
+            Viewport MAIN_VP
+            Display
+                %Keypad_Application
+
+            Function Response EXIT_APPL
+                Let COM_GRP.KEY_PRESSED = "E"
+                Return Immediate
+            End Response
+
+            Function Response PREV_SCRN
+                Let COM_GRP.KEY_PRESSED = "B"
+                Return Immediate
+            End Response
+
+            Function Response UPDATE_SCREEN
+                Return
+            End Response
+
+            Function Response ENTER_NOTES
+            Activate
+                Panel EZITRAK01_NOTES
+                Position Immediate TO Panel
+                    EZITRAK01_NOTES
+            End Response
+
+            Function Response SHOW_KEYS
+            Display
+                EZITRAK01_KEYS
+                Position Immediate TO Panel
+                    EZITRAK01_KEYS
+            End Response
+
+            Function Response SHOW_HINTS
+                Display
+                    EZITRAK01_HINTS
+            End Response
+
+            Literal Text
+                Line 2
+                Column 1
+                Value " Description    :"
+                Display
+                    Bold
+            End Literal
+
+            Field PROBLEM_DESC
+                Line 3
+                Column 3
+                Protected
+            End Field
+
+            Literal Text
+                Line 4
+                Column 2
+                Value "Priority :"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 4
+                Column 15
+                Value "Application :"
+                Display
+                    Bold
+            End Literal
+
+            Field APPLICATION_ID
+                Line 4
+                Column 29
+                Protected
+            End Field
+
+            Field PRIORITY_ID
+                Line 4
+                Column 13
+                Protected
+            End Field
+
+            Literal Text
+                Line 4
+                Column 33
+                Value "Status :"
+                Display
+                    Bold
+            End Literal
+
+            Field PROBLEM_STATUS
+                Line 4
+                Column 42
+                Require ((PROBLEM_STATUS = "O")
+                     OR (PROBLEM_STATUS = "C")
+                     OR (PROBLEM_STATUS = "R"))
+                    Message
+                        "status must be O or C or R"
+            End Field
+
+            Literal Text
+                Line 4
+                Column 43
+                Value " Redirect To :"
+                Display
+                    Bold
+            End Literal
+
+            Field PERSON_REDIRECTED_ID
+                Line 4
+                Column 58
+            End Field
+
+            Literal Text
+                Line 6
+                Column 2
+                Value "Person Assigned :"
+                Display
+                    Bold
+            End Literal
+
+            Field PERSON_ASSIGNED_ID
+                Line 6
+                Column 19
+            End Field
+
+            Field PERSON_ASSIGNED_DESC
+                Line 6
+                Column 24
+                Protected
+            End Field
+
+            Literal Text
+                Line 6
+                Column 50
+                Value "Est to Complete :"
+                Display
+                    Bold
+            End Literal
+
+            Field EST_TO_COMPLETE_DAYS
+                Line 6
+                Column 67
+                Justification Right
+                Range
+                    0 Through 42
+                        Message
+                            "Must complete within 42 days"
+            End Field
+
+            Literal Text
+                Line 6
+                Column 74
+                Value "Days"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 7
+                Column 2
+                Value "Progress :"
+                Display
+                    Bold
+            End Literal
+
+            Field PROGRESS_DESC
+                Line 8
+                Column 2
+            End Field
+
+            Literal Text
+                Line 10
+                Column 2
+                Value "Solved Date :"
+                Display
+                    Bold
+            End Literal
+
+            Field SOLVED_DATE
+                Line 10
+                Column 19
+            End Field
+
+            Literal Text
+                Line 10
+                Column 46
+                Value "Refer to Prob Nbr :"
+                Display
+                    Bold
+            End Literal
+
+            Field REF_PROBLEM_NUMBER
+                Line 10
+                Column 67
+                Justification Right
+            End Field
+
+            Literal Text
+                Line 11
+                Column 34
+                Value "Solution"
+                Display
+                    Bold
+            End Literal
+
+            Group DESC_GRP
+                Vertical
+                    Displays 6
+                /*    First 1 */
+                /*   Scroll By Page*/
+                Entry Response
+                    Message
+                        "Now here's where to enter the solution"
+                End Response
+
+                Function Response DOWN ITEM
+                    If LAST ITEM Then
+                        Message
+                            "At bottom"
+                    Else
+                        Position To Down Occurrence
+                    End If
+                End Response
+
+                Function Response UP ITEM
+                    If FIRST ITEM Then
+                        Message
+                            "At Top"
+                    Else
+                        Position To Up Occurrence
+                    End If
+                End Response
+
+                Field SOLUTION_DESC
+                    Line 12
+                    Column 2
+                End Field
+
+            End Group
+
+            Literal Rectangle
+                Line 1	Column 1
+                Line 19	Column 80
+            End Literal
+
+            Literal Polyline
+                Line 11	Column 1
+                Line 11	Column 32
+            End Literal
+
+            Literal Polyline
+                Line 11	Column 43
+                Line 11	Column 80
+            End Literal
+
+        End Panel
+
+    End Layout
+End Form

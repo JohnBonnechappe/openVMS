@@ -1,0 +1,418 @@
+Form EZITRAK061
+    /* This is the TRACKING Application details screen  */
+
+    Form Data 
+        APPLICATION_ID Character(3)
+        Group DESC_GRP 
+            Occurs 20
+            UPDATE_IND Character(1)
+            APPLICATION_ID Character(3)
+            APPLICATION_DESC Character(25)
+        End Group
+        Group COM_GRP 
+            KEY_PRESSED Character(1)
+        End Group
+        ERROR_MESSAGE Character(75)
+        CALL_STATUS Longword Integer
+    End Data
+
+  /*  Form Data 
+        COPY EZITRAK_CDD.EZITRAK011_REC
+    End Data */
+
+    Form Record EZITRAK061_REC
+        APPLICATION_ID Character(3)
+        Group COM_GRP
+            KEY_PRESSED Character(1)
+        End Group
+        ERROR_MESSAGE Character(75)
+    End Record
+
+    Form Record EZITRAK062_REC
+        Group DESC_GRP
+            Occurs 20
+            UPDATE_IND Character(1)
+            APPLICATION_ID Character(3)
+            APPLICATION_DESC Character(25)
+            REC_USER Character(8)
+            REC_TMSTAMP ADT
+        End Group
+        Group COM_GRP
+            KEY_PRESSED Character(1)
+        End Group
+        ERROR_MESSAGE Character(75)
+    End Record
+
+
+    Layout VT_LAYOUT
+        Device
+            Terminal
+                Type %VT100
+        End Device
+        Size 24 Lines by 80 Columns
+
+        Viewport HEADER_VP
+            Lines 2 Through 4
+            Columns 1 Through 80
+        End Viewport
+
+        Viewport KEYS_VIEWPORT
+            Lines 4 Through 20
+            Columns 58 Through 75
+        End Viewport
+
+        Viewport NOTES_VIEWPORT
+            Lines 4 Through 12
+            Columns 8 Through 34
+        End Viewport
+
+        Viewport HINTS_VP
+            Lines 15 Through 20
+            Columns 4 Through 75
+        End Viewport
+
+        Viewport MAIN_VP
+            Lines 5 Through 23
+            Columns 1 Through 80
+        End Viewport
+
+        Function UP ITEM
+            Is %UP
+        End Function
+
+        Function DOWN ITEM
+            Is %DOWN
+        End Function
+
+        Function EXIT_APPL
+            Is %KP_7
+        End Function
+
+        Function PREV_SCRN
+            Is %KP_8
+        End Function
+
+        Function UPDATE_SCREEN
+            Is %CARRIAGE_RETURN
+        End Function
+
+        Enable Response
+            Activate
+                Panel EZITRAK61_HEADER
+            Message
+                ERROR_MESSAGE
+        End Response
+
+        Disable Response
+            Remove All
+        End Response
+
+        Apply Field Default Of
+            DISPLAY Underlined
+            Autoskip
+            Use Help Message
+                "Real Men Don't use Help"
+        End Default
+
+
+        Panel EZITRAK61_HEADER
+            Viewport HEADER_VP
+            Display
+                %Keypad_Application
+
+/*
+             Function Response NEXT ITEM
+                IF NOT PANEL LAST ITEM THEN
+                    POSITION TO NEXT ITEM
+                End IF
+            End Response
+*/
+             Function Response BOUNDARY CURSOR RIGHT
+                    POSITION TO DOWN ITEM
+            End Response
+
+             Function Response BOUNDARY CURSOR LEFT
+                    POSITION TO UP ITEM
+            End Response
+
+            Function Response EXIT_APPL
+                Let COM_GRP.KEY_PRESSED = "E"
+                Return Immediate
+            End Response
+
+            Function Response UPDATE_SCREEN
+                CALL "EZITRAK0062"
+                    USING BY REFERENCE EZITRAK061_REC
+                          BY REFERENCE EZITRAK062_REC
+                    GIVING CALL_STATUS
+                If CALL_STATUS = 0 THEN
+                    Position to Previous Item
+                    Message
+                        ERROR_MESSAGE
+                Else
+                    Message "Update has Zonked " CALL_STATUS
+                End If
+                Activate
+                    Panel EZITRAK61_MAIN
+                Position Immediate To Panel EZITRAK61_MAIN
+            End Response
+
+            Literal Text
+                Line 2
+                Column 29
+                Value "EZITRAK - PROBLEM TRACKING"
+            End Literal
+
+            Literal Text
+                Line 2
+                Column 2
+                Value " Applic Code :"
+                Display
+                    Bold
+            End Literal
+
+            Field APPLICATION_ID
+                Line 2
+                Column 17
+                No Autoskip
+                Use Help Message
+                    "Enter an Application Number"
+                Uppercase
+            End Field
+
+            Literal Rectangle
+                Line 1	Column 1
+                Line 3	Column 80
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK01_KEYS
+            Viewport KEYS_VIEWPORT
+            Display
+                %Keypad_Application
+
+            Remove
+            Literal Text
+                Line 1
+                Column 4
+                Value "    Keys"
+            End Literal
+
+            Literal Polyline
+                Line 1	Column 1
+                Line 17	Column 1
+                Line 17	Column 18
+                Line 1	Column 18
+                Line 1	Column 1
+            End Literal
+
+            Literal Text
+                Line 12
+                Column 3
+                Value "Ret - Update"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 4
+                Column 4
+                Value " KP7 - Exit"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 6
+                Column 4
+                Value " KP8 - Prev"
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK01_NOTES
+            Viewport NOTES_VIEWPORT
+            Display
+                %Keypad_Application
+
+            Remove
+            Literal Rectangle
+                Line 1	Column 1
+                Line 9	Column 27
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK01_HINTS
+            Viewport HINTS_VP
+            Display
+                %Keypad_Application
+
+            Remove
+            Literal Rectangle
+                Line 1	Column 1
+                Line 6	Column 72
+            End Literal
+
+            Literal Text
+                Line 2
+                Column 3
+                Value "You should enter any progress remarks on this screen. "-
+                    "When Closing"
+            End Literal
+
+            Literal Text
+                Line 3
+                Column 3
+                Value "a problem, up to 20 lines are available for keeping a "-
+                    "record of how"
+            End Literal
+
+            Literal Text
+                Line 4
+                Column 3
+                Value "the problem was solved. You can also refer to an "-
+                    "earlier problem."
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK61_MAIN
+            Viewport MAIN_VP
+            Display
+                %Keypad_Application
+
+            Entry Response
+            End Response
+
+            Exit Response
+                Remove 
+                    MAIN_VP
+                Position to Previous Item
+                Deactivate Panel
+                    EZITRAK61_Main
+            End Response
+
+            Function Response EXIT_APPL
+                Let COM_GRP.KEY_PRESSED = "E"
+                Return Immediate
+            End Response
+
+            Function Response PREV_SCRN
+                Let COM_GRP.KEY_PRESSED = "B"
+                Position to Previous Panel
+            End Response
+
+            Function Response UPDATE_SCREEN
+                CALL "EZITRAK0063"
+                    USING BY REFERENCE EZITRAK062_REC 
+                     /*     BY REFERENCE OLD_EZITRAK062_REC  */
+                    GIVING CALL_STATUS
+                If CALL_STATUS = 0 THEN
+                    Position to Previous Item
+                    Message
+                        ERROR_MESSAGE
+                Else
+                    Message "Update has Zonked" CALL_STATUS
+                End If
+            End Response
+
+            Literal Text
+                Line 2
+                Column 34
+                Value "Applications Found"
+                Display
+                    Bold
+            End Literal
+
+            Group DESC_GRP
+                Vertical
+                    Displays 12
+                /*    First 1 */
+                /*   Scroll By Page*/
+
+                Entry Response
+                    Message
+                        "Now here's the list of application codes"
+                End Response
+
+                Function Response DOWN ITEM
+                    If LAST ITEM Then
+                        Message
+                            "At bottom"
+                    Else
+                        Position To Down Occurrence
+                    End If
+                End Response
+
+                Function Response UP ITEM
+                    If FIRST ITEM Then
+                        Message
+                            "At Top"
+                    Else
+                        Position To Up Occurrence
+                    End If
+                End Response
+
+                Field UPDATE_IND
+                    Line 6
+                    Column 2
+                    UPPERCASE
+           /*     Require ( DESC_GRP.UPDATE_IND ( * ) = "I"
+                     or DESC_GRP.UPDATE_IND ( * ) = "M"
+                     or DESC_GRP.UPDATE_IND ( * ) = "D" )
+                    Message "Ind must be I M or D"  */
+                Use Help Message
+                    "Enter a (I)nsert , (M)odify , (D)elete"
+                End Field
+
+                Field APPLICATION_ID
+                    Line 6
+                    Column 4
+                End Field
+
+                Field APPLICATION_DESC
+                    Line 6
+                    Column 12
+                End Field
+
+            End Group
+
+            Literal Rectangle
+                Line 1	Column 1
+                Line 19	Column 80
+            End Literal
+
+            Literal Text
+                Line 4
+                Column 24
+                Value " Description"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 4
+                Column 2
+                Value "Ind"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 4
+                Column 6
+                Value "Application"
+                Display
+                    Bold
+            End Literal
+
+        End Panel
+
+    End Layout
+End Form

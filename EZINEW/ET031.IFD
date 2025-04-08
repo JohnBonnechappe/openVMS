@@ -1,0 +1,529 @@
+Form EZITRAK031
+    /* This is the TRACKING search and browse screen  */
+
+    Form Data 
+        Group EZITRAK031_FRM
+            PROBLEM_STATUS Character(1)
+            APPLICATION_ID Character(3)
+            PRIORITY_ID Character(1)
+            CONTACT_DATE Date
+            CONTACT_PERSON_ID Character(4)
+            OTHER_SYSTEM_CODE Character(9)
+        End Group
+        Group EZITRAK032_FRM
+                    Occurs 16
+            PROBLEM_NUMBER Word Integer
+            PROBLEM_STATUS Character(1)
+            APPLICATION_ID Character(3)
+            PRIORITY_ID Character(1)
+            CONTACT_DATE Date
+            CONTACT_PERSON_ID Character(4)
+            PROBLEM_DESC Character(35)
+        End Group
+        Group COM_Grp
+            KEY_PRESSED Character(1)
+        End Group
+        ERROR_MESSAGE Character(75)
+        TODAYS_DATE Date CURRENT
+    End Data
+
+    Form Record EZITRAK031_REC
+        Group EZITRAK031_FRM
+            PROBLEM_STATUS Character(1)
+            APPLICATION_ID Character(3)
+            PRIORITY_ID Character(1)
+            CONTACT_DATE Date
+            CONTACT_PERSON_ID Character(4)
+            CONTACT_DEVICE Character(1)
+            OTHER_SYSTEM_CODE Character(9)
+        End Group
+        Group COM_Grp
+            KEY_PRESSED Character(1)
+        End Group
+        ERROR_MESSAGE Character(75)
+    End Record
+
+    Form Record EZITRAK032_REC
+        Group EZITRAK032_FRM
+                    Occurs 20
+            PROBLEM_NUMBER Word Integer
+            PROBLEM_STATUS Character(1)
+            PRIORITY_ID Character(1)
+            APPLICATION_ID Character(3)
+            PROBLEM_DESC Character(75)
+            CONTACT_DATE Date
+            CONTACT_PERSON_ID Character(4)
+            CONTACT_DEVICE Character(1)
+        End Group
+        Group COM_Grp
+            KEY_PRESSED Character(1)
+        End Group
+        ERROR_MESSAGE Character(75)
+    End Record
+
+
+    Layout VT_LAYOUT
+        Device
+            Terminal
+                Type %VT100
+        End Device
+        Size 24 Lines by 80 Columns
+
+        Viewport KEYS_VIEWPORT
+            Lines 4 Through 20
+            Columns 58 Through 74
+        End Viewport
+
+        Viewport HINTS_VIEWPORT
+            Lines 12 Through 19
+            Columns 4 Through 63
+        End Viewport
+
+        Viewport NOTES_VIEWPORT
+            Lines 4 Through 11
+            Columns 5 Through 29
+        End Viewport
+
+        Function UP ITEM
+            Is %UP
+        End Function
+
+        Function DOWN ITEM
+            Is %DOWN
+        End Function
+
+        Function EXIT_APPL
+            Is %KP_7 %F10 (%PF1 %CAPITAL_E)
+        End Function
+
+        Function PREV_SCRN
+            Is %KP_8
+        End Function
+
+        Function GOTO_NOTES
+            Is %KP_4
+        End Function
+
+        Function GOTO_HINTS
+            Is %KP_9
+        End Function
+
+        Function GOTO_KEYS
+            Is %KP_5
+        End Function
+
+        Function UPDATE_SCREEN
+            Is %CARRIAGE_RETURN
+        End Function
+
+        Transceive Response EZITRAK031_REC EZITRAK031_REC
+/*            Let EZITRAK031_FRM.CONTACT_DATE = TODAYS_DATE */
+            Activate
+                Panel EZITRAK31_PARAMETERS
+            Message ERROR_MESSAGE
+        End Response
+
+        Transceive Response EZITRAK032_REC EZITRAK032_REC
+            Activate
+                Panel EZITRAK31_BROWSE
+            Message ERROR_MESSAGE
+        End Response
+
+        Disable Response
+            Remove All
+        End Response
+
+        Function Response EXIT_APPL
+            Let COM_GRP.KEY_PRESSED = "E"
+            Return
+        End Response
+
+        Function Response PREV_SCRN
+            Let COM_GRP.KEY_PRESSED = "B"
+            Return
+        End Response
+
+        Function Response GOTO_NOTES
+            Activate
+                Panel EZITRAK31_NOTES
+        End Response
+
+        Function Response GOTO_KEYS
+            Display
+                EZITRAK31_KEYS
+        End Response
+
+        Function Response GOTO_HINTS
+            Display
+                EZITRAK31_HINTS
+        End Response
+
+        Function Response UPDATE_SCREEN
+            Return
+        End Response
+
+        FUNCTION Response UNDEFINED FUNCTION
+            Remove KEYS_VIEWPORT
+            Remove NOTES_VIEWPORT
+            Remove HINTS_VIEWPORT
+        End Response
+
+
+        Apply Field Default Of
+            Autoskip
+                Use Help Message
+                    "Real Men Don't use Help"
+        End Default
+
+        Panel EZITRAK31_PARAMETERS
+            Display Viewport
+                %Terminal_Width_80
+            Display
+                %Keypad_Application
+
+            Function Response GOTO_HINTS
+                Display
+                    EZITRAK31_HINTS
+            End Response
+
+            Literal Text
+                Line 3
+                Column 29
+                Value "EZITRAK - PROBLEM TRACKING"
+            End Literal
+
+            Literal Text
+                Line 8
+                Column 17
+                Value "Status       :"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 10
+                Column 17
+                Value "System       :"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 12
+                Column 17
+                Value "Priority     :"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 14
+                Column 17
+                Value "Contact Date :"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 16
+                Column 17
+                Value "Contact by   :"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 18
+                Column 17
+                Value "Other System Cd:"
+                Display
+                    Bold
+            End Literal
+
+        Group EZITRAK031_FRM
+
+            Field PROBLEM_STATUS
+                Line 8
+                Column 33
+                Uppercase
+                Autoskip
+            End Field
+
+            Field APPLICATION_ID
+                Line 10
+                Column 33
+                Uppercase
+                Autoskip
+            End Field
+
+            Field PRIORITY_ID
+                Line 12
+                Column 33
+                Uppercase
+                Autoskip
+                Highlight Bold
+                    When EZITRAK031_FRM.PRIORITY_ID = 1
+            End Field
+
+            Field CONTACT_DATE
+                Line 14
+                Column 33
+            End Field
+
+            Field CONTACT_PERSON_ID
+                Line 16
+                Column 33
+                Uppercase
+                Autoskip
+            End Field
+
+            Field OTHER_SYSTEM_CODE
+                Line 18
+                Column 33
+                Uppercase
+                Autoskip
+            End Field
+
+          End Group
+
+            Literal Rectangle
+                Line 2	Column 1
+                Line 4	Column 80
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK31_BROWSE
+            Display Viewport
+                %Terminal_Width_80
+            Display
+                %Keypad_Application
+
+            Remove
+            Function Response GOTO_HINTS
+                Display
+                    EZITRAK31_HINTS
+            End Response
+
+            Function Response GOTO_KEYS
+                Display
+                    EZITRAK31_KEYS
+            End Response
+
+            Literal Rectangle
+                Line 2	Column 1
+                Line 4	Column 80
+            End Literal
+
+            Literal Text
+                Line 3
+                Column 29
+                Value "EZITRAK - PROBLEM TRACKING"
+            End Literal
+
+            Literal Text
+                Line 5
+                Column 2
+                Value " Nbr"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 5
+                Column 7
+                Value " Stat "
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 5
+                Column 14
+                Value "Sys"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 5
+                Column 21
+                Value "Pri"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 5
+                Column 30
+                Value " Cont"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 5
+                Column 37
+                Value "  By "
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 5
+                Column 50
+                Value " Desc"
+                Display
+                    Bold
+            End Literal
+
+        Group EZITRAK032_FRM
+                Vertical
+            /*    Scroll By Page */
+                displays  15
+
+                Entry Response
+                    Message
+                        "Here's the records that were found"
+                End Response
+
+                Function Response DOWN ITEM
+                    If LAST ITEM THEN
+                       Message
+                        "At bottom"
+                    ELSE
+                        POSITION TO DOWN OCCURRENCE
+                    End IF
+                End Response
+
+                Function Response UP ITEM
+                    If FIRST ITEM THEN
+                       Message
+                        "At Top"
+                    ELSE
+                        POSITION TO UP OCCURRENCE
+                    End IF
+                End Response
+
+            Field PROBLEM_NUMBER
+                Line 6
+                Column 2
+                No DAta input
+            End Field
+
+            Field PROBLEM_STATUS
+                Line 6
+                Column 10
+                Protected
+            End Field
+
+            Field APPLICATION_ID
+                Line 6
+                Column 15
+                Protected
+            End Field
+
+            Field PRIORITY_ID
+                Line 6
+                Column 22
+                Protected
+            End Field
+
+            Field CONTACT_DATE
+                Line 6
+                Column 27
+                Protected
+            End Field
+
+            Field CONTACT_PERSON_ID
+                Line 6
+                Column 39
+                Protected
+            End Field
+
+            Field PROBLEM_DESC
+                Line 6
+                Column 44
+                Protected
+            End Field
+
+            End Group
+
+
+        End Panel
+
+
+        Panel EZITRAK31_KEYS
+            Viewport KEYS_VIEWPORT
+            Display
+                %Keypad_Application
+
+            Remove
+            /*This panel to accept a working note */
+
+            Literal Rectangle
+                Line 1	Column 1
+                Line 17	Column 17
+            End Literal
+
+            Literal Text
+                Line 2
+                Column 3
+                Value "KP7 - Exit"
+                Display
+                    Reverse
+            End Literal
+
+            Literal Text
+                Line 5
+                Column 3
+                Value "Ret - Update"
+                Display
+                    Reverse
+            End Literal
+
+            Literal Text
+                Line 7
+                Column 3
+                Value "KP7 - Hints"
+                Display
+                    Reverse
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK31_HINTS
+            Viewport HINTS_VIEWPORT
+            Display
+                %Keypad_Application
+
+            Remove
+            /* hints are displayed on this panel */
+            Literal Polyline
+                Line 1	Column 1
+                Line 1	Column 60
+                Line 8	Column 60
+                Line 8	Column 1
+                Line 1	Column 1
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK31_NOTES
+            Viewport NOTES_VIEWPORT
+            Display
+                %Keypad_Application
+
+            Remove
+            Literal Rectangle
+                Line 1	Column 1
+                Line 8	Column 25
+            End Literal
+
+        End Panel
+
+    End Layout
+End Form
