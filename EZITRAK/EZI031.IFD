@@ -1,0 +1,298 @@
+Form EZITRAK031
+    /* This is the TRACKING search and browse screen */
+
+    Form Data 
+        PROBLEM_NUMBER Word Integer
+        PROBLEM_STATUS Character(1)
+        APPLICATION_ID Character(3)
+        PRIORITY Character(1)
+        CONTACT_DATE Date
+        ASSIGNED_PERSON_ID Character(4)
+    End Data
+
+    Form Record EZITRAK041_REC
+        PROBLEM_NUMBER Word Integer
+    End Record
+
+
+    Layout VT_LAYOUT
+        Device
+            Terminal
+                Type %VT100
+        End Device
+        Size 24 Lines by 80 Columns
+
+        Viewport NOTES_VIEWPORT
+            Lines 4 Through 11
+            Columns 50 Through 74
+        End Viewport
+
+        Viewport HINTS_VIEWPORT
+            Lines 12 Through 19
+            Columns 4 Through 63
+        End Viewport
+
+        Viewport ALT_VIEWPORT
+            Lines 4 Through 11
+            Columns 5 Through 29
+        End Viewport
+
+        Function EXIT_APPL
+            Is %KP_7
+        End Function
+
+        Function GOTO_NOTES
+            Is %KP_8
+        End Function
+
+        Function GOTO_HINTS
+            Is %KP_9
+        End Function
+
+        Function UPDATE_SCREEN
+            Is %KP_ENTER
+        End Function
+
+        Transceive Response EZITRAK041_REC EZITRAK041_REC
+            Activate
+                Panel EZITRAK31_MAIN
+        End Response
+
+        Function Response EXIT_APPL
+            Return
+        End Response
+
+        Function Response GOTO_NOTES
+            Activate
+                Panel EZITRAK31_NOTES
+        End Response
+
+        Function Response UPDATE_SCREEN
+            Return
+        End Response
+
+
+        Panel EZITRAK31_MAIN
+            Display Viewport
+                %Terminal_Width_80
+            Display
+                %Keypad_Application
+
+            Function Response GOTO_HINTS
+                Activate
+                    Panel EZITRAK31_HINTS
+            End Response
+
+            Literal Polyline
+                Line 1	Column 1
+                Line 3	Column 1
+                Line 3	Column 80
+                Line 1	Column 80
+                Line 1	Column 1
+            End Literal
+
+            Literal Text
+                Line 2
+                Column 29
+                Value "EZITRAK - PROBLEM TRACKING"
+            End Literal
+
+            Literal Text
+                Line 2
+                Column 2
+                Value "               "
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 21
+                Column 22
+                Value "KP7 - Exit"
+                Display
+                    Reverse
+            End Literal
+
+            Literal Text
+                Line 21
+                Column 38
+                Value "Ret - Update"
+                Display
+                    Reverse
+            End Literal
+
+            Literal Text
+                Line 6
+                Column 17
+                Value "Status       :"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 8
+                Column 17
+                Value "System       :"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 10
+                Column 17
+                Value "Priority     :"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 12
+                Column 17
+                Value "Contact Date :"
+                Display
+                    Bold
+            End Literal
+
+            Literal Text
+                Line 14
+                Column 17
+                Value "Assigned To  :"
+                Display
+                    Bold
+            End Literal
+
+            Field PROBLEM_STATUS
+                Line 6
+                Column 33
+            End Field
+
+            Field APPLICATION_ID
+                Line 8
+                Column 33
+            End Field
+
+            Field PRIORITY
+                Line 10
+                Column 33
+            End Field
+
+            Field CONTACT_DATE
+                Line 12
+                Column 33
+            End Field
+
+            Field ASSIGNED_PERSON_ID
+                Line 14
+                Column 33
+            End Field
+
+        End Panel
+
+
+        Panel EZITRAK31_NOTES
+            Viewport NOTES_VIEWPORT
+            Display
+                %Keypad_Application
+
+            Remove
+            /* This panel to accept a working note */
+            Literal Polyline
+                Line 1	Column 1
+                Line 1	Column 25
+                Line 8	Column 25
+                Line 8	Column 1
+                Line 1	Column 1
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK31_HINTS
+            Viewport HINTS_VIEWPORT
+            Display
+                %Keypad_Application
+
+            Remove
+            /* hints are displayed on this panel */
+            Literal Polyline
+                Line 1	Column 1
+                Line 1	Column 60
+                Line 8	Column 60
+                Line 8	Column 1
+                Line 1	Column 1
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK31_MESSAGE
+            Viewport NOTES_VIEWPORT
+            Display
+                %Keypad_Application
+
+            Remove
+            Literal Text
+                Line 2
+                Column 1
+                Value " There are as yet no"
+            End Literal
+
+            Literal Text
+                Line 3
+                Column 2
+                Value "notes to read"
+            End Literal
+
+            Literal Polyline
+                Line 1	Column 1
+                Line 8	Column 1
+                Line 8	Column 25
+                Line 1	Column 25
+                Line 1	Column 1
+            End Literal
+
+            Literal Text
+                Line 7
+                Column 19
+                Value "JB..."
+            End Literal
+
+        End Panel
+
+
+        Panel EZITRAK31_ALT_NOTES
+            Viewport ALT_VIEWPORT
+            Display
+                %Keypad_Application
+
+            Remove
+            Literal Polyline
+                Line 1	Column 1
+                Line 8	Column 1
+                Line 8	Column 25
+                Line 1	Column 25
+                Line 1	Column 1
+            End Literal
+
+            Literal Text
+                Line 3
+                Column 5
+                Value "Alternate notes"
+            End Literal
+
+            Literal Text
+                Line 5
+                Column 5
+                Value "in this area"
+            End Literal
+
+            Literal Text
+                Line 7
+                Column 19
+                Value "JB..."
+            End Literal
+
+        End Panel
+
+    End Layout
+End Form

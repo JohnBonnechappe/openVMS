@@ -1,0 +1,92 @@
+Form EZITRAK041
+    /* This is the TRACKING Progress and solution screen */
+
+    Form Data 
+        PROBLEM_NUMBER Word Integer
+    End Data
+
+    Form Record EZITRAK041_REC
+        PROBLEM_NUMBER Word Integer
+    End Record
+
+
+    Layout VT_LAYOUT
+        Device
+            Terminal
+                Type %VT100
+        End Device
+        Size 24 Lines by 80 Columns
+
+        Function EXIT_APPL
+            Is %KP_7
+        End Function
+
+        Function UPDATE_SCREEN
+            Is %KP_ENTER
+        End Function
+
+        Transceive Response EZITRAK041_REC EZITRAK041_REC
+            Activate
+                Panel EZITRAK41_MAIN
+        End Response
+
+
+        Panel EZITRAK41_MAIN
+            Display Viewport
+                %Terminal_Width_80
+            Display
+                %Keypad_Application
+
+            Function Response EXIT_APPL
+                Return Immediate
+            End Response
+
+            Function Response UPDATE_SCREEN
+                Return
+            End Response
+
+            Literal Rectangle
+                Line 1	Column 1
+                Line 3	Column 80
+            End Literal
+
+            Literal Text
+                Line 2
+                Column 29
+                Value "EZITRAK - PROBLEM TRACKING"
+            End Literal
+
+            Literal Text
+                Line 2
+                Column 2
+                Value " Problem Nbr :"
+                Display
+                    Bold
+            End Literal
+
+            Field PROBLEM_NUMBER
+                Line 2
+                Column 17
+                /*             Output Picture is "Z(3)9" */
+            End Field
+
+            Literal Text
+                Line 21
+                Column 22
+                Value "KP7 - Exit"
+                Display
+                    Reverse
+            End Literal
+
+            Literal Text
+                Line 21
+                Column 38
+                Value "Ret - Update"
+                Display
+                    Reverse
+            End Literal
+
+        End Panel
+
+    End Layout
+End Form
