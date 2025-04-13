@@ -1,0 +1,29 @@
+OCV not getting thru?
+Try this:
+sel p.cust_no,p.date_time_stamp 
+from pos_transn_tbl p ,retail_locn_cr_card_type_tbl r
+where p.cust_no=r.CREDIT_CARD_TYPE_CUST_NO;
+
+Support Tips
+
+SupportLog for R397744
+locn is "1230" from reliance. Prod is 007110L BP Bulk diesel. search EOD_TRANSmission.DAT files for 007110 on a JDE record.
+ Get sales_docket_id=177450122
+Check records. Cust is 86031917 "CMBRICK9" Debtor type is "Lube Cust". Batch type is "OV".
+
+
+Barry Lipscombe 0408 595 615
+Freelance 1800 628 014
+
+P70 5628
+
+system_services
+rtl
+
+
+Update notes about Transmit
+
+Update notes about ftp
+
+TODO:
+
