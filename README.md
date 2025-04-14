@@ -1,5 +1,5 @@
 # openVMS
-openVMS programs and utilities
+openVMS programs, utilities, and documentation
 
 Some openVMS programs utilities and documentataion that I have written over the years
 
