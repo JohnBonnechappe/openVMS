@@ -1,0 +1,382 @@
+. JRB Ext 6129                    P1                                    29-05-90
+
+
+
+                     Johno's Easy Guide to LSE
+                    ---------------------------
+
+  LSE (language sensitive editor) is a text editor that is available on
+VAX/VMS. This document is a summary of the salient points of LSE.
+    
+  This guide is written for someone who is familiar with screen editors, but has
+had no experience with LSE.
+
+LSE uses function keys and a command line to effect changes.
+
+The following symbols are used :
+
+  1) The keys F1 thru F20 are the grey keys along the top edge of the keyboard.
+
+  2) The keys PF1 thru PF4 are located at the top of the numeric keypad. 
+
+  3) N indicates a key on the numeric keypad. eg N1 is the 1 key on the numeric 
+     keypad.
+
+  4) G indicates the gold key viz PF1 on the numeric keypad. eg GN1 is entered
+     by pressing both PF1 and 1 on the numeric keypad.
+
+  5) cont indicates the control key. eg cont A means press the control key and A
+     at the same time.
+
+Invoking
+---------
+  LSE is invoked by typing in LSE FILENAME at the VMS command prompt. If the 
+file name is omitted then the last session of LSE is continued. When reinvoking
+LSE, the setup parameters from the previous session such as text marks are lost.
+
+Leaving LSE
+------------
+  To leave LSE, move the cursor to the command line by pressing the Do key and
+then type in either EXIT or QUIT. If you type in EXIT, the file that you created
+or changed is saved. If you type in QUIT, no new file is saved.
+
+Saving changes
+--------------
+  To save changes and continue editing, press the Do key then enter WRI.
+
+Effect of LSE
+--------------
+When a file is edited with LSE, the original file stays unchanged. A new version
+of the file contains the modifications that were done in LSE.
+
+Command line
+-------------
+  To get to the command line, just press the Do key. Pressing the Do key again
+returns the cursor to the text.
+
+Scrolling
+----------
+  The text on the screen automatically scrolls when the cursor gets near either
+the top or bottom of the screen.
+.                                 p2                                    12-10-88
+
+Help
+-----
+  To see the help text, either :
+
+      1) press the Do key then type in HELP. This shows you all commands you
+         can enter on the command line.
+      2) press the help key which is located just to the left of the Do key.
+         This shows you what all the numeric key pad keys do and what control
+         keys are available.
+
+Top of document
+----------------
+  Press GN5
+
+Bottom of document
+-------------------
+  Press GN4
+
+Insert mode and overtype  
+-------------------------  
+  Toggle between these two functions by pressing Cont A
+
+
+Deleting a character
+---------------------
+  Press N, to delete the character under the cursor   
+or 
+  Press the backspace key to delete the character to the left of the cursor
+ 
+Deleting a line
+----------------
+  Press PF4.
+
+Go to beginning of line
+------------------------
+  Press F12 (at top of keyboard).
+
+Go to End of line
+------------------
+  Press N2
+
+Forward and reverse
+--------------------
+  The find and substitute functions operate either in forward (after the cursor)
+or in reverse (before the cursor). These directions are selected by pressing :
+      1) N4 for forward
+      2) N5 for reverse
+
+Finding text
+-------------
+  To locate a text string first set the direction of the search, then either
+press the Find key or press G PF3. You will be prompted for the text to locate.
+
+Substituting one text string for another
+-----------------------------------------
+  To do this, enter SUBS at the command line. You are then prompted for old and
+next text strings.
+
+.                                 P3                                    15-05-91
+
+Double window on a document
+----------------------------
+  You can have two windows on the screen (one above the other). To toggle 
+between one and two windows press G= . To move the cursor between documents
+press either G up arrow or G down arrow.
+
+  Once you have set up a double screen you can edit any file in either window by
+moving the cursor to the required window and then:
+      1) Press the Do key
+      2) Type in GOTO FILE FILENAME  where the FILENAME is the file to edit
+
+Marking a block of text
+------------------------
+  Mark the text by moving the cursor to the top of the text and pressing
+G. , then move the cursor to the end of the text. Text is marked as you move the
+cursor.
+ 
+  If you change your mind and dont want to mark the text after all, press GN. .
+
+Moving a block of text
+-----------------------
+  Mark some text to move and press N6. The text is now removed from the document
+and stored in a buffer. The text can now be copied from the buffer to any
+part of the document by moving the cursor to the appropriate point and
+pressing either the insert-here key or GN6.
+ 
+Going directly to a line in a document
+---------------------------------------
+If you know the line number to go to in a document then do the following:
+    1)  go to the top of the document by pressing G5
+    2)  Press the gold key (PF1)
+    3)  enter the line number
+    4)  press the down arrow 
+
+Similarly you can advance or regress through the document by omitting step 1
+and pressing either the up or down arrow.
+
+
+Inserting special characters
+-----------------------------
+To insert special characters :
+    1) GN3
+    2) enter the number eg 27 for  an escape
+    3) press return
+
+    eg esc   GN3 27 ret
+
+Inserting a form feed
+----------------------
+This inserts a page break for printing purposes
+cont L
+
+Alter Size of Scrolling region
+-------------------------------
+    This sets the number of lines at top and bottom of screen where placement of
+    the cursor causes scrolling.
+    SET SCROLL t b     !sets t lines at top and b lines at bottom
+    SET SCROLL 0 0     !effectively turns off scrolling
+.                                 P4                                    15-05-91
+
+Macros
+-------
+  A macro may be set up by using either the define command utility or the
+define key utility. For example to create a macro to move a block of text into
+the paste buffer without cutting the text from the document enter the
+following :
+    1) press the Do key
+    2) enter DEFINE COMMAND COP "DO CUT,PASTE"
+
+  This has now created a command called COP which does a CUT and PASTE.
+
+  Then whenever you mark some text you only need to enter COP on the command 
+line to move the marked text into the $PASTE buffer. The text may then be copied
+anywhere else by moving to the desired place and pressing the insert-here key.
+    
+
+Defining a new Key Function
+----------------------------
+  A command may be linked to a key as follows :
+    1) press the Do key
+    2) enter DEFINE KEY
+    3) press the key to be defined
+       ( eg gold c would be entered as C/IF_STATE=GOLD )
+    4) enter the command to link to the key (eg "DO CUT,PASTE")
+
+Saving your Macros  
+-------------------
+    1) Put the macros into a text file
+       (eg DEFINE COMMAND COP "DO CUT,PASTE" )
+    2) Save the text file
+    3) When you invoke LSE use the qualifier /INITIALIZATION=filespec
+
+To see tabs in a file
+---------------------
+    This causes all TABS in a file to display as "HT...."
+    1) SET MODE TAB=VISIBLE
+
+Saving your Tokens and templates (ignore this for now)                 
+-------------------------------------------------------                     
+  Save any you create by entering :
+    SAVE ENVIRONMENT FILESPEC
+
+  Subsequent ones can be saved in the same file by entering :
+    SAVE ENVIRONMENT/NEW FILESPEC
+
+Where the FILESPEC is a spec for a file to contain them
+
+Then whenever you invoke LSE use LSE/ENVIRONMENT=FILESPEC
+
+
+
+
+
+
+
+
+
+
+.                                 P5                                    15-05-91
+
+Copying text between existing files
+------------------------------------
+    1) Set up the two files in two windows on the screen.
+    2) Set up the Macro COP.
+    3) Mark the text to be copied
+    4) Type COP at the command line.
+    5) Move the cursor to the other window by pressing G and up or down arrow.
+    6) Move the cursor to the point where the text is to be copied to.
+    7) Press the Insert-here key or go to the command line and enter PASTE.
+
+    CUT/NOERASE may be used instead of the COP macro
+
+Copy a part of a file to a new file
+------------------------------------
+ 1) Mark the text to copy
+ 2) goto the command line and enter DO,CUT,PASTE
+ 3) goto the command line and enter GOTO FILE tmpfile/CREATE
+ 4) press the Insert Here key
+
+
+Change of case
+---------------
+ To change the case press GN1. Only one character is changed.
+ To change the case of 20 characters press G then 20 then GN1.
+
+
+Move Cursor to start of line
+-----------------------------
+ There are three ways to do this
+
+ method a   GOTO LINE/BEGINNING/REVERSE
+ method b   GOTO LINE/REVERSE/BOUND
+ method c   cont H
+
+Move Cursor to end of line
+---------------------------
+ GOTO LINE/FORW/END   !go to end of current line, if at end go end of next line
+ GOTO LINE/FORW/BOUND !go to end of current line regardless
+
+Look at function key settings
+------------------------------
+ SHOW KEY
+
+
+Move text sideways
+------------------
+ 1) Mark the text using select
+ 2) Press G left arraw or G right arrow
+
+
+Programming template
+--------------------
+ Enter the verb or part of a verb then press cont E.
+
+ Eg.  PERF then press cont E
+
+ All the possible expansions for PERFORM are then displayed. Pressing cont E
+ expands the PERFORM subclauses.
+.                                 P6                                    04-01-91
+
+Useful macros
+--------------
+cl       copies the current line
+cu       copies the current to to before the previous line
+
+cp       copies the previous line
+cp2      copies the previous two lines
+cp3      copies the previous three lines
+
+cn2      copies the next two lines
+cn3      copies the next three lines
+cn4      copies the next four lines
+
+mp       swaps the current line with the previous line
+il       inserts a blank line before the current line
+dl       deletes the current line
+dcl      deletes all text from the current line to end of file
+dfc      deletes all text from the start of the file to current line
+jl       joins the next line onto the end of the current line, cursor left
+         at join
+ml       swaps the current letter with the following one
+mw       swaps the current word   with the following one
+cw       copies the current word into the text buffer
+hw       change the case of the current word
+sa       sets a text flag a
+sb       sets a text flag b
+sc       sets a text flag c
+pa       goes to flag a
+pb       goes to flag b
+pc       goes to flag c
+rh       shift the screen right 80 characters
+lh       shift the screen left  80 characters
+w        two windows with a  different file in the lower window
+wr       two windows with a  different read-only file in the lower window
+wc       two windows with an empty new file in the lower window
+gf       goto a new file                                         
+gfr      goto a new read-only file                                         
+e        exit
+q        quit
+f6       marks the current line
+f7       copies the current line into the text buffer
+f8       moves the current line into the text buffer
+f9       inserts text from the buffer before the current line
+f10      copies marked text into the text buffer
+f11      swaps current letter with the following one
+Gf11     joins the part of the current line right of the cursor position 
+         onto the beginning of the next line
+f17      save the current changes
+Gf17     help.. displays text in bottom half of screen
+f18      exit
+f19      insert a blank line before the current line
+f20      delete the current line
+
+
+
+
+
+
+
+.                                 P7                                    31-05-91
+
+primitives
+-----------
+bf       goto/line/beginning/forward
+ef       goto/line/end/forward
+br       goto/line/beginning/reverse
+er       goto/line/end/reverse
+z5       do "goto line/reverse/bound"
+z6       do "goto line/forward/bound"
+
+caveat
+-------
+Ignore silly messages about already being at beginning or end of line. LSE needs
+a /NOLOG option before this can be fixed
+
+
+
+
+
+************************ end of doc *************************************

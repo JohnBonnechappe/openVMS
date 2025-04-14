@@ -1,0 +1,591 @@
+. JRB Ext 6129                    P1                                   17-02-92
+
+
+
+                     Johno's Easy Guide to ACMS
+                    ----------------------------
+
+  ACMS (application control & management sys.) is a package for creating and 
+using TP (transaction processing) applications in VAX/VMS. This document is a 
+summary of the salient points of ACMS.
+    
+  This guide is written for someone who is familiar with VAX/VMS, but
+has had no experience with ACMS.
+
+About ACMS
+-----------
+ACMS is used for running TP applications. It's advantages are that each 
+transaction may be assigned to a single component of the application called a
+task which is coded in a high level language. Screen IO and processing are
+logically separated in the task. This separation allows IO and processing to 
+be run on different machines if so desired. Processing is handled by
+conglomerations of processing steps called servers which may do processing
+for a number of users. Screen IO is handled by TDMS requests so no COBOL needs
+to be written for screen IO. 
+
+  An ACMS application consists of 4 types of definition :
+
+  1) Tasks       - these define units of work to be done by the application.
+
+  2) Task Groups - describe the resources required by a group of tasks.
+
+  3) Aplication definition - describes the environment and control 
+     characteristics of tasks and task groups.
+
+  4) Menus       - allow users to choose a task from a menu.
+
+These definitions are all created as text files then checked and put in the CDD
+by using ADU.
+
+To create and test tasks, only task and group definitions are required. 
+Application and menu definitiions are only required after testing is complete.
+
+Workspaces
+----------
+These are used as parameters to allow communication between ACMS, programs, and
+requests. They serve a similar purpose to records in the linkage section of a
+COBOL program. Workspaces must be put into the CDD before they can be accessed
+by ACMS. See the article "Johno's Easy guide to CDD" for details on how
+workspaces may be created and accessed.
+
+Note that workspaces have a size limit in ACMS (4000 bytes ?)
+
+Logicals
+---------
+ACMS$DIRECTORY needs to be set up to show where installed application files are
+put.
+
+
+
+
+.                                 p2                                    17-02-92
+
+Task
+-----
+Each task defines a single business transaction. This transaction may for
+example involve collecting data and updating a database. The transaction
+consists of two types of steps :
+
+1) Exchange.
+   For doing data IO with a screen. This may use TDMS forms or DECforms.
+   
+2) Processing.
+   For computation or interacting with a database. These are typically COBOL
+   subprograms.
+
+Tasks are set up using ADU (application definition utility). Task definitions
+are stored by ACMS in the CDD. Data is moved between the steps in a task using
+workspaces. These workspaces are records which are set up and put into the CDD
+using CDDL.
+
+
+Task Group
+-----------
+   Defines which tasks belong in the same group. Defines which procedures and
+request libraries and workspaces are used in the group. The task group is 
+created using ADU. ADU is also used to create a task group database. This task
+database is accessed by the application at run time.
+
+Application Definition
+-----------------------
+  Defines who can use the application, what username it is to run under, and
+how the application is to run. It also sets up logicals for the servers. 
+ADU is used to create the application database.
+Applications must be installed and started before they can be used.
+
+Menu Definition
+----------------
+  A menu heirarchy can be created. Each menu can call either other menus or 
+tasks. Tasks can be from a number of applications. The system of menus can be
+created and tested independently of tasks. If a task does not exist, an error
+message is displayed and menuing continues.
+
+  Menus are created using a text editor. Each menu may reside in a separate file
+in which case a careful naming convention is required. Alternatively all the
+menu definitions may be placed in the one file. Menus are stored in the CDD
+using ADU. A single menu database is created for the menu structure at run time.
+The ACMS knows what menu database to use by your having previously entered UDU
+and setting the default MDB field to the name of the menu database file.
+
+
+
+
+
+
+
+
+
+
+
+
+.                                 p3                                    29-05-90
+
+Getting it all Together to Testing Stage
+-----------------------------------------
+To get an application to the stage where individual tasks may be tested, the 
+following need to be created :
+
+    1) Logicals (to indicate where in the CDD components go)
+    2) Screens (including records and requests)
+    3) Workspaces (other than those for the forms)
+    4) Task
+    5) Task Group
+    6) Cobol Procedures. 
+
+It is better to use logicals rather than to rely on CDD$DEFAULT .
+
+Using ADU
+----------
+1) Put the following line in your LOGIN.COM file :
+
+   ADU :== $ACMSADU
+
+2) Type the following command :
+
+   $ADU
+
+3) To get back to the DCL prompt type :
+
+   ADU> EXIT
+
+ADU uses the CDD pathname specified by CDD$DEFAULT to store definitions, unless
+overriden by a logical or a specific CDD pathname.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.                                 p4                                    17-02-92
+
+Definitions are created using an editor (eg LSE) then processed (compiled and
+stored in the CDD) using ADU. Definitions consist of a series of clauses each
+of which is followed by a ; . The complete definition is followed by the
+statement END DEFINITION; .
+After the definition is created it is processed with the CREATE and BUILD 
+commands.
+
+1) Screens
+   Create form definitions, records and requests for each screen to be displayed
+   by the task.
+
+   Note that the order in which the records are specified at the head of the
+   request must match the order on the CALL REQUEST statement in the task.
+
+2) Create the Task and store it in the CDD
+   $EDIT taskname.TDF                !eg using EDT or LSE
+    include a replace task clause in the file
+
+   $ADU
+
+   ADU> @taskname.TDF                !puts the task definition in the CDD
+
+3) Create a group and store it in the CDD
+   $EDIT groupname.GDF                !eg using EDT or LSE
+    include a replace group clause in the file
+
+   $ADU
+
+   ADU> @groupname.GDF                !puts the group definition in the CDD
+   
+4) Create the task database
+
+   $ADU
+
+   ADU> BUILD GROUP cdd_group_name groupfile.TDB
+ 
+   /USER LIBRARY searches library to probe global symbols.
+
+Note that individual tasks are not built. When the group is built, all tasks
+mentioned in the group definition are included. It also builds an object file
+for each server, each to be linked with the COBOL programs. A file with
+extension of .TDB is created too.
+
+5) Create the COBOL program
+   Use EXIT PROGRAM instead of STOP RUN.
+   Use LINKAGE SECTION and PROCEDURE USING to communicate with the task.
+   It is better to use a copy statement to copy a CDD record into the LINKAGE
+   area. This ensures that it matches the workspace in the ACMS call.
+   Use COBOL/DEBUG to compile
+
+6) Link the objects.
+   A link is needed for each server.
+   LINK/DEBUG groupobjfile,cobol1,cobol2,etc
+
+
+
+
+
+.                                 p5                                 17-02-92
+
+7) Run the Task
+   $ACMS/DEBUG {/WORKSPACE} groupfilename !use /WORKSPACE if looking at fields
+   ACMSDBG> SET BREAK taskname\stepname\{$BEGIN,$ACTION,$END}
+   ACMSDBG> ECAMINE fieldname OF recordname
+   ACMSDBG> SELECT taskname
+       DBG> GO
+   ACMSDBG> EXIT
+
+   ACMSDBG> START/ALL   starts all servers
+   ACMSDBG> STOP/ALL    stops all servers
+
+Notes
+------
+1) If the COBOL programs are changed the group does not need to be rebuilt. Just
+   recompile the programs and relink with the group object. Only the server
+   containing the program need be relinked.
+
+2) If a task definition is changed, the task must be recompiled and the group
+   rebuilt. Then do the LINK again.
+
+3) If a workspace is changed, then all programs, tasks, and requests that use
+   the workspace need to be recompiled. If a task must be recompiled, then the
+   group must also be rebuilt.
+
+4) If a request is changed, then the request library must be rebuilt.
+
+5) If the text of an include statement is changed, all requests that use the
+   text must be rerun thru RDU, and the group must be rebuilt.
+
+6) ACMS/DEBUG only refers to SYSTEM and JOB logicals. Ie PROCESS logicals are
+   ignored. Therefore define all logicals using DEFINE/JOB or DEFINE/SYS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.                                 p6                                 17-02-92
+
+Beyond Testing
+---------------
+When tasks are working properly in DEBUG mode, the next step is to test them
+from an application. Applications are called from an ACMS menu.
+
+The following steps should be followed to get an application running :
+
+    1) Get tasks working properly in DEBUG mode
+    2) Create an application definition
+    3) Create menu definitions
+    4) Compile and put the application into the CDD using ADU
+    5) Compile and put the menu into the CDD using ADU
+    6) Build the application
+    7) Build the menu
+    8) Use UDU to tell ACMS where the menu is
+    9) Install the application
+   10) Start the application
+
+1) Application
+Create the application definition and store it in the CDD. Include a replace
+application clause in the file. To compile and put in the CDD :
+
+$ADU @appfile.ADF
+
+To build the application :
+
+$ADU BUILD APPL cdd_appl_name appfile.ADB
+
+The application only accesses system logicals. Any job logicals
+that were accessed in debug mode must be declared in the application definition.
+In this way different versions of the application may access different data
+files.
+
+2) Menu
+Create the menu definitions and put them in the CDD. Include a replace menu
+clause in the file. To compile and put in the CDD :
+
+$ADU @menufile.MDF
+
+To build the menu structure :
+$ADU BUILD MENU cdd_menu_name menufile.MDB
+
+To run a task ina an application on another node from any menu, prefix the
+application name eith the node eg :
+
+EMP_ENQ : task is EMP_ENQ in nodename::appname;
+
+This lien goes into the menu definition.
+
+
+
+
+
+
+
+
+
+
+.                                 P7                                 17-02-92
+
+3) To run it
+
+To see what applications are available enter :
+
+ACMS/SHOW APPLICATION
+
+To enable ACMS to find the menu database file :
+
+$UDU
+
+UDU>SHOW username
+
+UDU>COPY username1 userename2         !copies setup from one user to another
+
+UDU>MOD username/MDB=menufile.MDB
+
+UDU>MOD/INIT=(APP=appname,TASK=taskname) !sets the task that runs when ACMS/E
+                                         !is entered
+
+UDU>
+
+UDU>EXIT
+
+
+To install an ACMS application, enter the following :
+ 
+ACMS/INSTALL appname
+
+To start an ACMS application, enter the following :
+ 
+ACMS/START APP appname
+
+To run an ACMS application, enter the following :
+ 
+ACMS/ENTER
+
+If the application is changed, do the following :
+
+    1) stop the old application  ACMS/STOP APP appname 
+    2) rebuild the application
+    3) reinstall the application
+    4) re start the application
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.                                 P8                                    30-05-90
+
+Problems
+---------
+Here are some suggestions for handling any problems that appear.
+
+1)
+If AUDIT is turned on, it is possible to examine the audit log using the
+ACMSATR utility. Symbol ATR :== $ACMSATR should be put in login.
+
+Examine the log using  $ATR/SINCE=08:00/USER=username
+
+2)
+The RUJ file for RDB can be redirected. This may be done by putting the
+following into the SERVER LOGICALS part of the application definition file :
+
+RDMS$RUJ = directory_name
+
+This overrides the system logical used by the ACMS application.
+Make sure the directory exists and that you have write permission to it.
+
+3)
+If submitting a batch job from a task DCL server using the SUBMIT statement,
+do not use /NOTIFY. It works in debug, but won't work in the application. No
+error message is logged or displayed. The batch job just won't submit.
+If you really must use /NOTIFY, then try using "PROCESSING WITH TERMINAL I/O"
+in the task step.
+
+Also be sure to use a full directory name or logical to point to where the 
+batch file is located. The logical must be either a system logical or must be
+declared in the application definition.
+
+4)
+If a workspace is declared as USE WORKSPACE WITH UPDATE, it cannot be declared
+in a task argument with a MODIFY qualifier. If a task is to be called from
+either a menu or another task, and either way data in the workspace is to be
+saved, then it is necessary to have a dummy task to be called from the menu,
+so the real task is always called from another task. It should be declared as
+"LOCAL". The dummy task has the USE WITH MODIFY cluase, the real task has the
+TASK ARGUMENT clause.
+
+5) Vague errors such as "Privilege denied by database facility" which have no apparent cause may be due to insufficient quota or insufficient privileges on the username that the servers run under. This situation is especially indicated if the task runs correctly in DEBUG or in another environment. The username that the servers run under is defined in the application definition. It can be checked using:
+ $RUN SYS$SYSTEM:AUTHORIZE
+  UAF> SHOW username
+  UAF> MOD username/bytlm=2000000
+  UAF> MOD username/priv=CMKRNL      etc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.                                 P9                                    30-05-90
+
+Common Errors
+-------------
+    Most problems encountered when writing tasks are encompassed by the
+   following catalogue.
+
+  1) Workspaces not initialized
+  2) Workspace field incompatibility
+  3) Data changes not "taking". This is caused by a workspace not being declared
+     "UPDATE" or "MODIFY".
+  4) Many stubborn errors may be cleared by doing a complete rebuild of the
+     following elements in the order shown :
+         Records
+         Programs
+         Tasks
+         Group
+         Requests
+  5) Conversion errors or access violations. Check order of parameters in tasks
+     requests and program linkage sections. Check order of fields within records
+     and check field sizes and descriptions.
+
+Other errors may indicate :
+
+1) If after typing in ACMS/E you get :
+   "INVALID LOGIN ATTEMPT"
+   it means that the menu database file is missing or not pointed to by UDU.
+
+2) If you select a task from a menu and get the following :
+   "SEL NOT AVAILABLE AT THIS TIME"
+   it means that the application has not been started.
+
+3) "Access violation" during run time means that parameters do not match. Check
+   the linkage section in programs against the call statement in ACMS. Or check
+   the RECORDS clauses in requests. They must match the CAMS call and records 
+   must be in the same order.
+
+4) Each server runs under a specific username, as does the application. These are all defined in the application definition. If a task runs in DEBUG but not in the application, compare the quotas and privileges of the server usernames with those of the account used to run debug.
+
+Glossary
+---------
+CDD   - the place where definitions are stored after they have been compiled.
+
+ADU   - the utility that is used for compiling ACMS components. It then puts
+        them into the CDD.
+
+CDDL  - the utility that compiles records and places them in the CDD
+
+Johno - Author of the illuminating "Easy Guide" series. Genius and master wit.
+
+
+
+
+
+
+
+
+
+
+
+.                                 P10                                   31-05-91
+
+                            Problem Page
+                           --------------
+
+No !     PROBLEM                     !                SOLUTION
+---+---------------------------------!------------------------------------------
+ 1 ! When ACMS/E is entered, message ! ACMS can't find the menu database. File
+   ! of ?INVALID LOGIN ATTEMPT       ! either has wrong name, is in wrong
+   !                                 ! directory, or UDU is not pointing to the
+   !                                 ! right file.
+   !                                 !
+ 2 ! When ACMS/E is entered, message ! 1) Get into UDU, check that init task &
+   ! of ?INITIAL TASK FAILED         ! application are spelt correctly.
+   !                                 ! 2) Check that any system logicals used by
+   !                                 ! UDU are defined.
+   !                                 ! 3) Check that application for initial
+   !                                 ! task is running
+   !                                 ! 4) Stop application then restart it
+   !                                 !
+ 3 ! "Error extending file - disk    ! 1) Check that the disk has free space
+   ! quota exceeded"                 ! use SHOW DEVICE diskname
+   !                                 ! 2) Check your quota. Use SHOW QUOTA
+   !                                 ! 3) Check who owns the file and see what
+   !                                 ! their quota is. Use DIR/OWNER
+   !                                 ! 
+ 4 ! "Error reaching procedure server! Use ATR/LIST/SINCE=hh:mm to see what the
+   !  condition handler"             ! problem was then fix it
+   !                                 !
+ 5 ! In debug, screen is immobile    ! In another session do a RMU/SHO/USERS
+   ! after a key is pressed          ! on the database logical. If a server is
+   !                                 ! holding the database do a STOP servername
+   !                                 ! or a STOP/ID=serverid
+   !                                 !
+ 6 ! When stopping an application,   ! DO an ACMS/SHO/USER/FULL then do an
+   ! the application stays in a state! ACMS/CANCEL/USER on the offender or
+   ! of STOPPING                     ! do an ACMS/CANCEL/TASK
+   !                                 !
+   !                                 !
+ 7 ! "Privilege denied by database   ! If the task runs properly in debug, check
+   !  facility"                      ! quotas and privileges of the server
+   !                                 ! usernames and application username.
+   !                                 !
+---+---------------------------------!------------------------------------------
+
+******************************** end of doc ********************************
