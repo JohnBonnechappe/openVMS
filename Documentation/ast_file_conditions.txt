@@ -1,0 +1,42 @@
+01      file-ast-conditions         pic X(2)                                    value "00".
+  88    file-ok                     value "00". 
+  88    file-ok-dup-rec             value "02". 
+  88    file-ok-dup-alt-key-write   value "02". 
+  88    file-ok-bad-rec-read-lgth   value "04".
+  88    opt-file-not-present        value "05" "15" "25".
+  88    file-dev-invalid-org        value "07".
+  88    file-seq-no-more-records    value "10" "13" "16" "46".
+  88    file-at-end                 value "13" "10".
+  88    file-rel-rec-no-too-big     value "14".
+  88    file-opt-at-end             value "15".
+  88    file-no-valid-next-record   value "16" "10" "46".
+  88    file-seq-err                value "21". 
+  88    file-key-chg-on-write       value "21". 
+  88    file-dup-record             value "22". 
+  88    file-dup-key-on-write       value "22". 
+  88    file-no-record              value "23". 
+  88    file-key-bound-exceed       value "24".
+  88    file-opt-invalid-key        value "25".
+88    file-perm-error             value "30".
+88    file-seq-bound-exceed       value "34".
+  88    device-in-error             value "34" "95".
+  88    file-not-found              value "35" "97".
+  88    file-bad-device             value "37".
+  88    file-prev-locked            value "38".
+  88    file-attr-conflict          value "39".
+  88    file-open-already           value "41".
+  88    file-not-open               value "42" "47" "48" "49" "94".
+  88    file-no-prev-read-start     value "43".
+  88    file-inv-rec-size           value "44".
+  88    file-rec-lckd-avail         value "90".
+  88    file-locked                 value "91" "38".
+  88    file-rec-locked             value "92". 
+  88    file-no-curr-rec            value "93". 
+  88    device-full                 value "95".
+  88    file-close-error            value "98".
+88    file-ok-open                value "00" "41". 
+  88    file-ok-write               value "00" "02". 
+  88    file-ok-rewrite             value "00" "02". 
+  88    file-ok-read                value "00" "04" "90". 
+  88    file-ok-close               value "00" "42".
+
