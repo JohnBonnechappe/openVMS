@@ -3,6 +3,8 @@ openVMS programs, utilities, and documentation
 
 Some openVMS programs utilities and documentataion that I have written over the years
 
+👀 Documentation for working in OpenVMS
+
 👀 DCL_menu_system is an automatic menu/form utility for DCL
 
 👀 EZITRAK this is a utility to log support issues in an Rdb database using DEFFORMS for data entry. This was written when I was in production support when we had no app for keeping track of issues. Coding is done in COBOL. Database access is through Modular SQL.
